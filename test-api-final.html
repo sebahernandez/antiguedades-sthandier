@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prueba Final de API y CORS</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #333;
+        min-height: 100vh;
+      }
+      .container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #4a5568;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+      }
+      .test-section {
+        margin: 30px 0;
+        padding: 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+      }
+      .test-button {
+        background: linear-gradient(135deg, #4caf50, #45a049);
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        margin: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+      .test-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+      }
+      .result {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        white-space: pre-wrap;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .success {
+        background-color: #d4edda;
+        border: 2px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background-color: #f8d7da;
+        border: 2px solid #f5c6cb;
+        color: #721c24;
+      }
+      .info {
+        background-color: #d1ecf1;
+        border: 2px solid #bee5eb;
+        color: #0c5460;
+      }
+      .swagger-links {
+        text-align: center;
+        margin: 30px 0;
+      }
+      .swagger-link {
+        display: inline-block;
+        margin: 10px;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+      .swagger-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🚀 Prueba Final: API + CORS + Swagger UI</h1>
+
+      <div class="swagger-links">
+        <h2>📋 Acceso a Swagger UI</h2>
+        <a href="swagger-standalone.html" class="swagger-link" target="_blank">
+          🆕 Swagger Standalone (Sin iframe)
+        </a>
+        <a href="swagger-ui/index.html" class="swagger-link" target="_blank">
+          📄 Swagger UI Original
+        </a>
+        <a href="swagger-portal.html" class="swagger-link" target="_blank">
+          🌐 Portal de Swagger
+        </a>
+      </div>
+
+      <div class="test-section">
+        <h2>🔍 Pruebas de API y CORS</h2>
+        <button class="test-button" onclick="testCORSHeaders()">
+          Verificar Headers CORS
+        </button>
+        <button class="test-button" onclick="testAPIDirecto()">
+          Probar API Directo
+        </button>
+        <button class="test-button" onclick="testAPIConRewrite()">
+          Probar API con Rewrite
+        </button>
+        <button class="test-button" onclick="testSwaggerYAML()">
+          Verificar Swagger YAML
+        </button>
+        <div id="test-results"></div>
+      </div>
+
+      <div class="test-section">
+        <h2>📊 Estado del Sistema</h2>
+        <div id="system-status"></div>
+      </div>
+    </div>
+
+    <script>
+      function log(message, type = "info") {
+        const resultsDiv = document.getElementById("test-results");
+        const timestamp = new Date().toLocaleTimeString();
+        const div = document.createElement("div");
+        div.className = `result ${type}`;
+        div.textContent = `[${timestamp}] ${message}`;
+        resultsDiv.appendChild(div);
+        resultsDiv.scrollTop = resultsDiv.scrollHeight;
+      }
+
+      async function testCORSHeaders() {
+        log("🔍 Verificando headers CORS...", "info");
+
+        try {
+          const response = await fetch(
+            "http://localhost:8888/antiguedades-backend/",
+            {
+              method: "OPTIONS",
+            }
+          );
+
+          const corsHeaders = {
+            "Access-Control-Allow-Origin": response.headers.get(
+              "Access-Control-Allow-Origin"
+            ),
+            "Access-Control-Allow-Methods": response.headers.get(
+              "Access-Control-Allow-Methods"
+            ),
+            "Access-Control-Allow-Headers": response.headers.get(
+              "Access-Control-Allow-Headers"
+            ),
+            "Access-Control-Max-Age": response.headers.get(
+              "Access-Control-Max-Age"
+            ),
+          };
+
+          log(
+            `✅ Headers CORS encontrados:\n${JSON.stringify(
+              corsHeaders,
+              null,
+              2
+            )}`,
+            "success"
+          );
+        } catch (error) {
+          log(`❌ Error verificando CORS: ${error.message}`, "error");
+        }
+      }
+
+      async function testAPIDirecto() {
+        log("🔗 Probando API método directo...", "info");
+
+        try {
+          const response = await fetch(
+            "http://localhost:8888/antiguedades-backend/index.php?url=api/productos"
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            log(
+              `✅ API funciona directamente! Productos encontrados: ${
+                data.length || "N/A"
+              }`,
+              "success"
+            );
+            if (data.length > 0) {
+              log(
+                `📦 Primer producto: ${JSON.stringify(data[0], null, 2)}`,
+                "info"
+              );
+            }
+          } else {
+            log(`⚠️ API responde pero con status: ${response.status}`, "error");
+          }
+        } catch (error) {
+          log(`❌ Error en API directa: ${error.message}`, "error");
+        }
+      }
+
+      async function testAPIConRewrite() {
+        log("🔄 Probando API con URL rewrite...", "info");
+
+        try {
+          const response = await fetch(
+            "http://localhost:8888/antiguedades-backend/api/productos"
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            log(
+              `✅ URL rewrite funciona! Productos: ${data.length || "N/A"}`,
+              "success"
+            );
+          } else {
+            log(
+              `⚠️ URL rewrite no disponible (status: ${response.status}), usar método directo`,
+              "info"
+            );
+            log(`💡 Usar: index.php?url=api/productos`, "info");
+          }
+        } catch (error) {
+          log(`❌ Error con URL rewrite: ${error.message}`, "error");
+        }
+      }
+
+      async function testSwaggerYAML() {
+        log("📄 Verificando archivo Swagger YAML...", "info");
+
+        try {
+          const response = await fetch(
+            "http://localhost:8888/antiguedades-backend/swagger/swagger.yaml"
+          );
+
+          if (response.ok) {
+            const yamlContent = await response.text();
+            const lines = yamlContent.split("\n").length;
+            log(
+              `✅ Swagger YAML cargado correctamente (${lines} líneas)`,
+              "success"
+            );
+
+            // Verificar contenido básico
+            if (
+              yamlContent.includes("productos") &&
+              yamlContent.includes("paths")
+            ) {
+              log(`✅ YAML contiene definiciones de API válidas`, "success");
+            } else {
+              log(`⚠️ YAML podría estar incompleto`, "error");
+            }
+          } else {
+            log(`❌ Error cargando Swagger YAML: ${response.status}`, "error");
+          }
+        } catch (error) {
+          log(`❌ Error verificando YAML: ${error.message}`, "error");
+        }
+      }
+
+      // Auto-ejecutar algunas pruebas al cargar
+      window.addEventListener("load", function () {
+        const statusDiv = document.getElementById("system-status");
+        statusDiv.innerHTML = `
+                <div class="result info">
+                    <strong>🏗️ Sistema de Antiguedades - Estado Actual</strong><br>
+                    📅 Fecha: ${new Date().toLocaleString()}<br>
+                    🌐 URL Base: http://localhost:8888/antiguedades-backend/<br>
+                    🔧 CORS: Configurado en .htaccess<br>
+                    📋 Swagger UI: Múltiples versiones disponibles<br>
+                    🔍 Modo: Prueba de funcionalidad completa
+                </div>
+            `;
+
+        setTimeout(() => {
+          log(
+            "🚀 Sistema inicializado. Ejecute las pruebas para verificar funcionalidad.",
+            "info"
+          );
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

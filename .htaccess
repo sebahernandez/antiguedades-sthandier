@@ -1,0 +1,46 @@
+# CONFIGURACIÓN CORS ULTRA-ROBUSTA PARA SWAGGER UI
+# Aplicar a todos los archivos PHP y recursos estáticos
+
+# Headers CORS principales - OBLIGATORIOS
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+Header always set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control"
+Header always set Access-Control-Max-Age "86400"
+
+# Headers adicionales para mejor compatibilidad con navegadores
+Header always set Access-Control-Allow-Credentials "false"
+Header always set Vary "Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+
+# Configuración específica para archivos de Swagger UI
+<Files "*.js">
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Content-Type "application/javascript"
+</Files>
+
+<Files "*.css">
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Content-Type "text/css"
+</Files>
+
+<Files "*.yaml">
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Content-Type "application/x-yaml"
+</Files>
+
+<Files "*.yml">
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Content-Type "application/x-yaml"
+</Files>
+
+# Configuración de tipos MIME
+AddType application/x-yaml .yaml
+AddType application/x-yaml .yml
+AddType application/javascript .js
+
+# Redirigir todas las solicitudes de API a index.php (si mod_rewrite está disponible)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/(.*)$ index.php?url=api/$1 [QSA,L]
+</IfModule>
