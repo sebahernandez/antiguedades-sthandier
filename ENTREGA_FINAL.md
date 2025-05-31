@@ -34,10 +34,12 @@ El proyecto **API Antigüedades Sthandier** ha sido desarrollado exitosamente co
 ### 🔧 Aspectos Técnicos:
 
 - ✅ **Adaptación para MAMP** (query parameters en lugar de URL rewriting)
-- ✅ **Headers CORS** configurados para Swagger UI
+- ✅ **Headers CORS Ultra-Robustos** configurados para Swagger UI
+- ✅ **Solución definitiva CORS** para navegadores web
 - ✅ **Validación de datos** en todos los endpoints
 - ✅ **Manejo de errores** robusto
 - ✅ **Estructura MVC** organizada
+- ✅ **Múltiples interfaces** de testing y diagnóstico
 
 ---
 
@@ -45,13 +47,14 @@ El proyecto **API Antigüedades Sthandier** ha sido desarrollado exitosamente co
 
 ### URLs Principales:
 
-| Herramienta                | URL                                                            | Estado       |
-| -------------------------- | -------------------------------------------------------------- | ------------ |
-| **Swagger UI**             | http://localhost:8888/antiguedades-backend/swagger-ui/         | ✅ Operativo |
-| **Portal Swagger**         | http://localhost:8888/antiguedades-backend/swagger-portal.html | ✅ Operativo |
-| **API Base**               | http://localhost:8888/antiguedades-backend/index.php           | ✅ Operativo |
-| **Herramienta de Pruebas** | http://localhost:8888/antiguedades-backend/api-test-new.html   | ✅ Operativo |
-| **Diagnóstico**            | http://localhost:8888/antiguedades-backend/diagnostico.php     | ✅ Operativo |
+| Herramienta                 | URL                                                                | Estado       |
+| --------------------------- | ------------------------------------------------------------------ | ------------ |
+| **Swagger UI (CORS Fixed)** | http://localhost:8888/antiguedades-backend/swagger-standalone.html | ✅ Operativo |
+| **Swagger UI Clásico**      | http://localhost:8888/antiguedades-backend/swagger-ui/             | ✅ Operativo |
+| **Portal Swagger**          | http://localhost:8888/antiguedades-backend/swagger-portal.html     | ✅ Operativo |
+| **API Base**                | http://localhost:8888/antiguedades-backend/index.php               | ✅ Operativo |
+| **Herramienta de Pruebas**  | http://localhost:8888/antiguedades-backend/api-test-new.html       | ✅ Operativo |
+| **Diagnóstico**             | http://localhost:8888/antiguedades-backend/diagnostico.php         | ✅ Operativo |
 
 ---
 

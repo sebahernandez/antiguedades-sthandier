@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎯 Swagger UI - API Antigüedades (CORS Fixed)</title>
+    <link rel="stylesheet" type="text/css" href="./swagger-ui/swagger-ui.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./swagger-ui/favicon-32x32.png"
+      sizes="32x32"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./swagger-ui/favicon-16x16.png"
+      sizes="16x16"
+    />
+    <style>
+      body {
+        margin: 0;
+        background: #fafafa;
+      }
+      .header {
+        background: #007bff;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 1.5em;
+      }
+      .header p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+      }
+      .swagger-container {
+        margin-top: 100px;
+        padding: 20px;
+      }
+      .cors-info {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        margin: 0 20px 20px 20px;
+        border-radius: 5px;
+        border: 1px solid #c3e6cb;
+      }
+      .error-info {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        margin: 0 20px 20px 20px;
+        border-radius: 5px;
+        border: 1px solid #f5c6cb;
+        display: none;
+      }
+      .btn {
+        background: #28a745;
+        color: white;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 0 5px;
+        display: inline-block;
+      }
+      .btn:hover {
+        background: #218838;
+        color: white;
+      }
+      .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .status-ok {
+        background: #28a745;
+      }
+      .status-error {
+        background: #dc3545;
+      }
+      .status-warning {
+        background: #ffc107;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎯 Swagger UI - API Antigüedades Backend</h1>
+      <p>
+        <span id="cors-status" class="status-indicator status-warning"></span>
+        Estado CORS: <span id="cors-text">Verificando...</span> |
+        <a href="./cors-diagnostico.html" class="btn" target="_blank"
+          >🔧 Diagnóstico CORS</a
+        >
+        <a href="./swagger-portal.html" class="btn" target="_blank"
+          >🏠 Portal</a
+        >
+      </p>
+    </div>
+
+    <div class="swagger-container">
+      <div class="cors-info" id="cors-success">
+        <strong>✅ Configuración CORS Optimizada</strong><br />
+        Esta versión de Swagger UI está configurada específicamente para evitar
+        problemas de CORS. Los endpoints funcionan directamente sin
+        restricciones de origen cruzado.
+      </div>
+
+      <div class="error-info" id="cors-error">
+        <strong>❌ Error CORS Detectado</strong><br />
+        <span id="error-details"></span><br />
+        <strong>Soluciones:</strong>
+        <ul>
+          <li>Verificar que MAMP esté ejecutándose en puerto 8888</li>
+          <li>
+            Comprobar que la API responda en:
+            <code>http://localhost:8888/antiguedades-backend/index.php</code>
+          </li>
+          <li>
+            Usar el
+            <a href="./cors-diagnostico.html" target="_blank"
+              >diagnóstico CORS</a
+            >
+            para más detalles
+          </li>
+        </ul>
+      </div>
+
+      <div id="swagger-ui"></div>
+    </div>
+
+    <!-- Swagger UI Resources -->
+    <script src="./swagger-ui/swagger-ui-bundle.js" charset="UTF-8"></script>
+    <script
+      src="./swagger-ui/swagger-ui-standalone-preset.js"
+      charset="UTF-8"
+    ></script>
+
+    <script>
+      // Configuración mejorada de Swagger UI con manejo de CORS
+      window.onload = function () {
+        // Test inicial de conectividad
+        testCORSConnection();
+
+        // Configuración de Swagger UI con interceptores CORS
+        const ui = SwaggerUIBundle({
+          url: "http://localhost:8888/antiguedades-backend/swagger/swagger.yaml",
+          dom_id: "#swagger-ui",
+          deepLinking: true,
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+          layout: "StandaloneLayout",
+
+          // Interceptor de requests - manejo de CORS
+          requestInterceptor: (request) => {
+            console.log("🚀 Swagger UI Request:", request);
+
+            // Asegurar headers CORS
+            request.headers = request.headers || {};
+            request.headers["Content-Type"] = "application/json";
+            request.headers["Accept"] = "application/json";
+
+            // No agregar Origin header - lo maneja el navegador
+            delete request.headers["Origin"];
+
+            return request;
+          },
+
+          // Interceptor de responses - logging de CORS
+          responseInterceptor: (response) => {
+            console.log("📥 Swagger UI Response:", response);
+
+            if (
+              response.status === 0 ||
+              (response.status >= 400 && response.status < 500)
+            ) {
+              console.error("⚠️ Posible error CORS:", response);
+              showCORSError(
+                "Error de conectividad. Verificar configuración CORS."
+              );
+            } else {
+              showCORSSuccess();
+            }
+
+            return response;
+          },
+
+          // Configuración adicional
+          tryItOutEnabled: true,
+          filter: true,
+          showExtensions: true,
+          showCommonExtensions: true,
+
+          // Eventos
+          onComplete: () => {
+            console.log("✅ Swagger UI cargado exitosamente");
+            showCORSSuccess();
+          },
+
+          onFailure: (error) => {
+            console.error("❌ Error cargando Swagger UI:", error);
+            showCORSError(
+              `Error al cargar Swagger UI: ${error.message || error}`
+            );
+          },
+        });
+
+        // Guardar referencia global
+        window.ui = ui;
+      };
+
+      // Función para testear conectividad CORS
+      async function testCORSConnection() {
+        try {
+          updateCORSStatus("warning", "Verificando...");
+
+          // Test 1: Verificar acceso al YAML
+          const yamlResponse = await fetch(
+            "http://localhost:8888/antiguedades-backend/swagger/swagger.yaml"
+          );
+          if (!yamlResponse.ok) {
+            throw new Error(`YAML no accesible: ${yamlResponse.status}`);
+          }
+
+          // Test 2: Verificar API
+          const apiResponse = await fetch(
+            "http://localhost:8888/antiguedades-backend/index.php?route=productos"
+          );
+          if (!apiResponse.ok) {
+            throw new Error(`API no responde: ${apiResponse.status}`);
+          }
+
+          // Test 3: Verificar headers CORS
+          const corsHeaders = [
+            "access-control-allow-origin",
+            "access-control-allow-methods",
+            "access-control-allow-headers",
+          ];
+
+          let corsOk = true;
+          for (const header of corsHeaders) {
+            if (!apiResponse.headers.get(header)) {
+              corsOk = false;
+              break;
+            }
+          }
+
+          if (!corsOk) {
+            throw new Error("Headers CORS incompletos");
+          }
+
+          updateCORSStatus("ok", "Conectado");
+          showCORSSuccess();
+        } catch (error) {
+          console.error("❌ Error en test CORS:", error);
+          updateCORSStatus("error", "Error");
+          showCORSError(error.message);
+        }
+      }
+
+      function updateCORSStatus(status, text) {
+        const indicator = document.getElementById("cors-status");
+        const textElement = document.getElementById("cors-text");
+
+        indicator.className = `status-indicator status-${status}`;
+        textElement.textContent = text;
+      }
+
+      function showCORSSuccess() {
+        document.getElementById("cors-success").style.display = "block";
+        document.getElementById("cors-error").style.display = "none";
+      }
+
+      function showCORSError(message) {
+        document.getElementById("cors-success").style.display = "none";
+        document.getElementById("cors-error").style.display = "block";
+        document.getElementById("error-details").textContent = message;
+      }
+
+      // Event listeners para debugging
+      window.addEventListener("unhandledrejection", function (event) {
+        console.error("⚠️ Promise rejection no manejada:", event.reason);
+        if (
+          event.reason &&
+          event.reason.message &&
+          event.reason.message.includes("fetch")
+        ) {
+          showCORSError("Error de red o CORS. Verificar conectividad.");
+        }
+      });
+    </script>
+  </body>
+</html>

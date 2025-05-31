@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🧪 Test CORS Rápido</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🧪 Test CORS Rápido</h1>
+      <p>
+        Prueba simple para verificar que CORS está funcionando correctamente con
+        Swagger UI.
+      </p>
+
+      <button onclick="testAPI()">🚀 Probar API</button>
+      <button onclick="testPreflight()">🔍 Probar Preflight</button>
+      <button onclick="openSwagger()">📄 Abrir Swagger UI</button>
+
+      <div id="results"></div>
+    </div>
+
+    <script>
+      const resultsDiv = document.getElementById("results");
+
+      function addResult(message, type = "success") {
+        const div = document.createElement("div");
+        div.className = type;
+        div.innerHTML = message;
+        resultsDiv.appendChild(div);
+      }
+
+      async function testAPI() {
+        try {
+          addResult("🔄 Probando API...", "success");
+
+          const response = await fetch(
+            "http://localhost:8888/antiguedades-backend/index.php?route=productos"
+          );
+          const data = await response.json();
+
+          addResult(
+            `✅ API funcionando: ${
+              data.length
+            } productos encontrados<br><pre>${JSON.stringify(
+              data[0],
+              null,
+              2
+            )}</pre>`,
+            "success"
+          );
+        } catch (error) {
+          addResult(`❌ Error: ${error.message}`, "error");
+        }
+      }
+
+      async function testPreflight() {
+        try {
+          addResult("🔄 Probando Preflight...", "success");
+
+          const response = await fetch(
+            "http://localhost:8888/antiguedades-backend/index.php?route=productos",
+            {
+              method: "OPTIONS",
+              headers: {
+                Origin: "http://localhost:8888",
+                "Access-Control-Request-Method": "GET",
+                "Access-Control-Request-Headers": "Content-Type",
+              },
+            }
+          );
+
+          const headers = {};
+          for (let [key, value] of response.headers.entries()) {
+            if (key.includes("access-control")) {
+              headers[key] = value;
+            }
+          }
+
+          addResult(
+            `✅ Preflight OK (${response.status})<br><pre>${JSON.stringify(
+              headers,
+              null,
+              2
+            )}</pre>`,
+            "success"
+          );
+        } catch (error) {
+          addResult(`❌ Preflight Error: ${error.message}`, "error");
+        }
+      }
+
+      function openSwagger() {
+        window.open(
+          "http://localhost:8888/antiguedades-backend/swagger-standalone.html",
+          "_blank"
+        );
+      }
+    </script>
+  </body>
+</html>

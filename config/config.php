@@ -13,10 +13,10 @@ class Config {
     const DB_USER = 'root';
     const DB_PASS = 'root';
     
-    // Headers CORS
+    // Headers CORS - Configuración completa para Swagger UI
     const CORS_ORIGINS = '*';
     const CORS_METHODS = 'GET, POST, PUT, DELETE, PATCH, OPTIONS';
-    const CORS_HEADERS = 'Content-Type, Authorization';
+    const CORS_HEADERS = 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers';
     
     // Configuración de desarrollo
     const DEBUG_MODE = true;

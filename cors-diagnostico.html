@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔧 Diagnóstico CORS - Swagger UI</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f8f9fa;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      .info {
+        background: #e3f2fd;
+        color: #0d47a1;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .result {
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Diagnóstico CORS - Swagger UI</h1>
+
+      <div class="info">
+        <strong>🎯 Propósito:</strong> Esta herramienta diagnostica problemas de
+        CORS entre Swagger UI y tu API.
+      </div>
+
+      <h3>📋 Tests de CORS:</h3>
+
+      <button onclick="testCORSPreflight()">
+        🔍 Test CORS Preflight (OPTIONS)
+      </button>
+      <button onclick="testAPICall()">🚀 Test Llamada API (GET)</button>
+      <button onclick="testSwaggerYAML()">📄 Test Swagger YAML</button>
+      <button onclick="testAllEndpoints()">🧪 Test Todos los Endpoints</button>
+
+      <div id="results"></div>
+
+      <h3>💡 Información Técnica:</h3>
+      <div class="info">
+        <strong>¿Por qué CORS?</strong><br />
+        CORS (Cross-Origin Resource Sharing) es una política de seguridad que
+        los navegadores aplican cuando:
+        <ul>
+          <li>
+            Una página web (origen A) intenta hacer solicitudes a un servidor
+            diferente (origen B)
+          </li>
+          <li>
+            Swagger UI corre en localhost:8888 y hace solicitudes a tu API en
+            localhost:8888
+          </li>
+          <li>
+            Aunque sean el mismo servidor, diferentes rutas pueden activar
+            políticas CORS
+          </li>
+        </ul>
+      </div>
+
+      <h3>🛠️ Estado Actual de la Configuración:</h3>
+      <div id="cors-config"></div>
+    </div>
+
+    <script>
+      const API_BASE = "http://localhost:8888/antiguedades-backend/index.php";
+      const resultsDiv = document.getElementById("results");
+
+      function addResult(title, content, type = "info") {
+        const div = document.createElement("div");
+        div.className = `result ${type}`;
+        div.innerHTML = `<strong>${title}</strong><br>${content}`;
+        resultsDiv.appendChild(div);
+      }
+
+      async function testCORSPreflight() {
+        addResult(
+          "🔍 Iniciando Test CORS Preflight...",
+          "Enviando solicitud OPTIONS"
+        );
+
+        try {
+          const response = await fetch(`${API_BASE}?route=productos`, {
+            method: "OPTIONS",
+            headers: {
+              Origin: "http://localhost:8888",
+              "Access-Control-Request-Method": "GET",
+              "Access-Control-Request-Headers": "Content-Type, Authorization",
+            },
+          });
+
+          const headers = {};
+          for (let [key, value] of response.headers.entries()) {
+            if (key.includes("access-control")) {
+              headers[key] = value;
+            }
+          }
+
+          addResult(
+            "✅ CORS Preflight Response",
+            `Status: ${
+              response.status
+            }<br>Headers CORS:<br><pre>${JSON.stringify(
+              headers,
+              null,
+              2
+            )}</pre>`,
+            response.status === 200 ? "success" : "error"
+          );
+        } catch (error) {
+          addResult(
+            "❌ Error en CORS Preflight",
+            `Error: ${error.message}`,
+            "error"
+          );
+        }
+      }
+
+      async function testAPICall() {
+        addResult("🚀 Iniciando Test API Call...", "Enviando solicitud GET");
+
+        try {
+          const response = await fetch(`${API_BASE}?route=productos`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await response.json();
+
+          addResult(
+            "✅ API Call Response",
+            `Status: ${response.status}<br>Productos encontrados: ${
+              Array.isArray(data) ? data.length : "N/A"
+            }<br>Primer producto: <pre>${JSON.stringify(
+              data[0] || "No data",
+              null,
+              2
+            )}</pre>`,
+            response.ok ? "success" : "error"
+          );
+        } catch (error) {
+          addResult("❌ Error en API Call", `Error: ${error.message}`, "error");
+        }
+      }
+
+      async function testSwaggerYAML() {
+        addResult(
+          "📄 Iniciando Test Swagger YAML...",
+          "Verificando acceso al archivo YAML"
+        );
+
+        try {
+          const response = await fetch(
+            "http://localhost:8888/antiguedades-backend/swagger/swagger.yaml"
+          );
+          const text = await response.text();
+
+          addResult(
+            "✅ Swagger YAML Response",
+            `Status: ${response.status}<br>Content-Type: ${response.headers.get(
+              "content-type"
+            )}<br>Tamaño: ${
+              text.length
+            } caracteres<br>Primeras líneas:<br><pre>${text.substring(
+              0,
+              200
+            )}...</pre>`,
+            response.ok ? "success" : "error"
+          );
+        } catch (error) {
+          addResult(
+            "❌ Error en Swagger YAML",
+            `Error: ${error.message}`,
+            "error"
+          );
+        }
+      }
+
+      async function testAllEndpoints() {
+        const endpoints = ["?route=productos", "?route=productos&id=1"];
+
+        for (const endpoint of endpoints) {
+          try {
+            const response = await fetch(`${API_BASE}${endpoint}`);
+            const data = await response.json();
+
+            addResult(
+              `📊 Endpoint: ${endpoint}`,
+              `Status: ${response.status} | Response: ${JSON.stringify(
+                data
+              ).substring(0, 100)}...`,
+              response.ok ? "success" : "error"
+            );
+          } catch (error) {
+            addResult(
+              `❌ Error en ${endpoint}`,
+              `Error: ${error.message}`,
+              "error"
+            );
+          }
+        }
+      }
+
+      // Mostrar configuración CORS actual
+      document.getElementById("cors-config").innerHTML = `
+            <div class="success">
+                <strong>✅ Headers CORS Configurados:</strong><br>
+                • Access-Control-Allow-Origin: *<br>
+                • Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS<br>
+                • Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin<br>
+                • Access-Control-Allow-Credentials: true<br>
+                • Access-Control-Max-Age: 86400
+            </div>
+        `;
+    </script>
+  </body>
+</html>
