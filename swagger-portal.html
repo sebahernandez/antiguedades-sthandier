@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎯 Swagger UI - Antigüedades Backend</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f8f9fa;
+        line-height: 1.6;
+      }
+      .header {
+        background: #007bff;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .info-box {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+      }
+      .success-box {
+        background: #e8f5e8;
+        border: 1px solid #4caf50;
+        color: #2e7d32;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+      }
+      .swagger-frame {
+        width: 100%;
+        height: 600px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 5px;
+      }
+      .btn:hover {
+        background: #0056b3;
+      }
+      code {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: "Courier New", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎯 Swagger UI - API Antigüedades Backend</h1>
+      <p>Documentación interactiva con pruebas en vivo</p>
+    </div>
+
+    <div class="container">
+      <div class="success-box">
+        <h3>✅ API Completamente Configurada</h3>
+        <p>
+          La API está funcionando correctamente con el sistema de query
+          parameters adaptado para MAMP.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <h4>📋 Información del Sistema:</h4>
+        <ul>
+          <li>
+            <strong>Servidor API:</strong>
+            <code>http://localhost:8888/antiguedades-backend/index.php</code>
+          </li>
+          <li>
+            <strong>Swagger YAML:</strong>
+            <code
+              >http://localhost:8888/antiguedades-backend/swagger/swagger.yaml</code
+            >
+          </li>
+          <li>
+            <strong>Sistema de URLs:</strong> Query Parameters (compatible con
+            MAMP)
+          </li>
+          <li><strong>CORS:</strong> Configurado para Swagger UI</li>
+        </ul>
+      </div>
+
+      <h3>🎪 Accesos Directos:</h3>
+      <a
+        href="http://localhost:8888/antiguedades-backend/swagger-ui/index.html"
+        class="btn"
+        target="_blank"
+      >
+        🚀 Abrir Swagger UI
+      </a>
+      <a
+        href="http://localhost:8888/antiguedades-backend/api-test-new.html"
+        class="btn"
+        target="_blank"
+      >
+        🧪 Herramienta de Pruebas
+      </a>
+      <a
+        href="http://localhost:8888/antiguedades-backend/diagnostico.php"
+        class="btn"
+        target="_blank"
+      >
+        🔧 Diagnóstico del Sistema
+      </a>
+
+      <h3>📚 Ejemplos de URLs para Swagger:</h3>
+      <div class="info-box">
+        <p>
+          <strong>Nota:</strong> Los endpoints en Swagger están configurados con
+          query parameters:
+        </p>
+        <ul>
+          <li>
+            <code>GET /?route=productos</code> - Obtener todos los productos
+          </li>
+          <li>
+            <code>GET /productos-por-id?route=productos&id=1</code> - Obtener
+            producto específico
+          </li>
+          <li><code>POST /?route=productos</code> - Crear nuevo producto</li>
+          <li>
+            <code>PUT /productos-por-id?route=productos&id=1</code> - Actualizar
+            producto
+          </li>
+          <li>
+            <code>DELETE /productos-por-id?route=productos&id=1</code> -
+            Eliminar producto
+          </li>
+          <li>
+            <code
+              >PATCH
+              /productos-reservar?route=productos&id=1&action=reservar</code
+            >
+            - Cambiar reserva
+          </li>
+        </ul>
+      </div>
+
+      <h3>🎯 Swagger UI Integrado:</h3>
+      <iframe
+        src="http://localhost:8888/antiguedades-backend/swagger-ui/index.html"
+        class="swagger-frame"
+        title="Swagger UI - API Antigüedades"
+      ></iframe>
+
+      <div class="info-box">
+        <h4>💡 Instrucciones de Uso:</h4>
+        <ol>
+          <li>En Swagger UI, haz clic en cualquier endpoint para expandirlo</li>
+          <li>
+            Haz clic en <strong>"Try it out"</strong> para habilitar las pruebas
+          </li>
+          <li>Completa los parámetros requeridos (route, id, etc.)</li>
+          <li>
+            Para endpoints POST/PUT/PATCH, ingresa el JSON en el cuerpo de la
+            solicitud
+          </li>
+          <li>
+            Haz clic en <strong>"Execute"</strong> para probar el endpoint
+          </li>
+          <li>Verifica la respuesta en la sección de resultados</li>
+        </ol>
+      </div>
+
+      <div class="success-box">
+        <h4>🎉 Estado: Completamente Funcional</h4>
+        <p>
+          Todos los endpoints están documentados y funcionando correctamente en
+          Swagger UI.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Verificar conectividad de la API
+      fetch(
+        "http://localhost:8888/antiguedades-backend/index.php?route=productos"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("✅ API conectada correctamente:", data);
+          if (data.length > 0) {
+            const statusDiv = document.createElement("div");
+            statusDiv.className = "success-box";
+            statusDiv.innerHTML = `
+                        <h4>🎯 Conexión API Verificada</h4>
+                        <p>✅ API respondiendo correctamente con ${data.length} productos en la base de datos.</p>
+                    `;
+            document.querySelector(".container").appendChild(statusDiv);
+          }
+        })
+        .catch((error) => {
+          console.error("❌ Error conectando con la API:", error);
+          const errorDiv = document.createElement("div");
+          errorDiv.style.background = "#ffebee";
+          errorDiv.style.border = "1px solid #f44336";
+          errorDiv.style.color = "#c62828";
+          errorDiv.style.padding = "15px";
+          errorDiv.style.borderRadius = "5px";
+          errorDiv.style.margin = "15px 0";
+          errorDiv.innerHTML = `
+                    <h4>⚠️ Error de Conexión</h4>
+                    <p>No se pudo conectar con la API. Verifica que MAMP esté funcionando.</p>
+                `;
+          document.querySelector(".container").appendChild(errorDiv);
+        });
+    </script>
+  </body>
+</html>

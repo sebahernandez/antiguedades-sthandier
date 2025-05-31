@@ -6,13 +6,25 @@ info:
     Esta API permite gestionar productos antiguos del emprendimiento Antigüedades Sthandier,
     incluyendo funciones para crear, listar, actualizar, reservar y eliminar productos.
 
+    **Nota importante:** Esta API utiliza query parameters debido a limitaciones de mod_rewrite en MAMP.
+
 servers:
-  - url: http://localhost:8888/antiguedades-backend
+  - url: http://localhost:8888/antiguedades-backend/index.php
+    description: Servidor MAMP local
 
 paths:
-  /productos:
+  /:
     get:
       summary: Obtener todos los productos
+      description: Obtiene la lista completa de productos disponibles
+      parameters:
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [productos]
+          example: productos
       responses:
         "200":
           description: Lista de productos
@@ -22,30 +34,72 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Producto"
+              example:
+                - id: 1
+                  nombre: "Jarrón Antiguo"
+                  descripcion: "Hermoso jarrón de cerámica del siglo XIX"
+                  precio: 150.00
+                  categoria: "ceramica"
+                  estado_reserva: "disponible"
 
     post:
       summary: Crear un nuevo producto
+      description: Crea un nuevo producto en el inventario
+      parameters:
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [productos]
+          example: productos
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/ProductoInput"
+            example:
+              nombre: "Nuevo Producto"
+              descripcion: "Descripción del producto"
+              precio: 125.50
+              categoria: "decoracion"
       responses:
         "201":
           description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  id:
+                    type: string
+              example:
+                mensaje: "Producto creado exitosamente"
+                id: "6"
         "400":
-          description: Error de entrada
+          description: Error de entrada - datos requeridos faltantes
 
-  /productos/{id}:
+  /productos-por-id:
     get:
       summary: Obtener un producto por ID
+      description: Obtiene los detalles de un producto específico
       parameters:
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [productos]
+          example: productos
         - name: id
-          in: path
+          in: query
           required: true
           schema:
             type: integer
+          example: 1
       responses:
         "200":
           description: Producto encontrado
@@ -53,52 +107,117 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Producto"
+              example:
+                id: 1
+                nombre: "Jarrón Antiguo"
+                descripcion: "Hermoso jarrón de cerámica del siglo XIX"
+                precio: "150.00"
+                categoria: "ceramica"
+                estado_reserva: "disponible"
         "404":
           description: Producto no encontrado
 
     put:
       summary: Actualizar un producto por ID
+      description: Actualiza completamente un producto existente
       parameters:
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [productos]
+          example: productos
         - name: id
-          in: path
+          in: query
           required: true
           schema:
             type: integer
+          example: 1
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProductoInput"
+              $ref: "#/components/schemas/ProductoCompleto"
+            example:
+              nombre: "Jarrón Antiguo Actualizado"
+              descripcion: "Descripción actualizada"
+              precio: 175.00
+              categoria: "ceramica"
+              estado_reserva: "disponible"
       responses:
         "200":
           description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+              example:
+                mensaje: "Producto actualizado exitosamente"
         "404":
           description: Producto no encontrado
 
     delete:
       summary: Eliminar un producto por ID
+      description: Elimina permanentemente un producto del inventario
       parameters:
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [productos]
+          example: productos
         - name: id
-          in: path
+          in: query
           required: true
           schema:
             type: integer
+          example: 5
       responses:
         "200":
           description: Producto eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+              example:
+                mensaje: "Producto eliminado correctamente"
         "404":
           description: Producto no encontrado
 
-  /productos/{id}/reservar:
+  /productos-reservar:
     patch:
       summary: Cambiar estado de reserva del producto
+      description: Cambia el estado de reserva de un producto (disponible/reservado)
       parameters:
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [productos]
+          example: productos
         - name: id
-          in: path
+          in: query
           required: true
           schema:
             type: integer
+          example: 1
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [reservar]
+          example: reservar
       requestBody:
         required: true
         content:
@@ -109,9 +228,20 @@ paths:
                 estado_reserva:
                   type: string
                   enum: [disponible, reservado]
+            example:
+              estado_reserva: "reservado"
       responses:
         "200":
           description: Estado de reserva actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+              example:
+                mensaje: "Estado de reserva actualizado"
         "400":
           description: Datos inválidos
         "404":
@@ -124,20 +254,55 @@ components:
       properties:
         id:
           type: integer
+          description: ID único del producto
+          example: 1
         nombre:
           type: string
+          description: Nombre del producto
+          example: "Jarrón Antiguo"
         descripcion:
           type: string
+          description: Descripción detallada del producto
+          example: "Hermoso jarrón de cerámica del siglo XIX"
         precio:
-          type: number
-          format: float
+          type: string
+          description: Precio del producto (como string en la BD)
+          example: "150.00"
         categoria:
           type: string
+          description: Categoría del producto
+          example: "ceramica"
         estado_reserva:
           type: string
           enum: [disponible, reservado]
+          description: Estado de reserva del producto
+          example: "disponible"
 
     ProductoInput:
+      type: object
+      required:
+        - nombre
+        - precio
+      properties:
+        nombre:
+          type: string
+          description: Nombre del producto (requerido)
+          example: "Nuevo Producto"
+        descripcion:
+          type: string
+          description: Descripción del producto (opcional)
+          example: "Descripción del producto"
+        precio:
+          type: number
+          format: float
+          description: Precio del producto (requerido)
+          example: 125.50
+        categoria:
+          type: string
+          description: Categoría del producto (opcional, por defecto 'general')"
+          example: "decoracion"
+
+    ProductoCompleto:
       type: object
       required:
         - nombre
@@ -148,15 +313,26 @@ components:
       properties:
         nombre:
           type: string
+          description: Nombre del producto
+          example: "Producto Actualizado"
         descripcion:
           type: string
+          description: Descripción del producto
+          example: "Descripción actualizada"
         precio:
           type: number
+          format: float
+          description: Precio del producto
+          example: 175.00
         categoria:
           type: string
+          description: Categoría del producto
+          example: "ceramica"
         estado_reserva:
           type: string
           enum: [disponible, reservado]
+          description: Estado de reserva del producto
+          example: "disponible"
 
 x-performance:
   rateLimit: 100 requests/minute
